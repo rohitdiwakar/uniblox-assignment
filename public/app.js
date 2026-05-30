@@ -2,7 +2,8 @@ const API = '';  // same-origin — Express serves this file and the API
 
 // ── State ──────────────────────────────────────────────────────────────────
 let cartId = null;
-let cartItems = [];  // local mirror to avoid re-fetching on every render
+let cartItems = [];    // local mirror to avoid re-fetching on every render
+let productsMap = {};  // productId → product, for name lookups in cart
 
 // ── Init ───────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
@@ -46,6 +47,7 @@ async function loadProducts() {
 }
 
 function renderProducts(products) {
+  productsMap = Object.fromEntries(products.map(p => [p.id, p]));
   const grid = document.getElementById('products-grid');
   grid.innerHTML = products.map(p => `
     <div class="product-card">
@@ -94,15 +96,18 @@ function renderCartItems() {
     document.getElementById('cart-subtotal').textContent = '$0.00';
     return;
   }
-  container.innerHTML = cartItems.map(item => `
+  container.innerHTML = cartItems.map(item => {
+    const name = productsMap[item.productId]?.name ?? item.productId;
+    return `
     <div class="cart-item">
       <div class="cart-item-info">
-        <span class="cart-item-name">${item.productId}</span>
+        <span class="cart-item-name">${name}</span>
         <span class="cart-item-meta">Qty: ${item.quantity} &times; $${item.unitPrice.toFixed(2)}</span>
       </div>
       <span class="cart-item-price">$${(item.quantity * item.unitPrice).toFixed(2)}</span>
     </div>
-  `).join('');
+  `;
+  }).join('');
   const subtotal = cartItems.reduce((s, i) => s + i.quantity * i.unitPrice, 0);
   document.getElementById('cart-subtotal').textContent = `$${subtotal.toFixed(2)}`;
 }
@@ -176,13 +181,27 @@ async function loadStats() {
 
 function renderStats(stats, container) {
   const codes = stats.discountCodes;
+
+  const codeRows = codes.list.length === 0
+    ? '<p class="muted" style="margin-top:10px">No codes generated yet.</p>'
+    : codes.list.map(c => `
+        <div class="code-entry">
+          <span class="code-text">${c.code}</span>
+          <span class="badge ${c.isUsed ? 'badge-used' : 'badge-unused'}">${c.isUsed ? 'Used' : 'Unused'}</span>
+        </div>
+      `).join('');
+
   container.innerHTML = `
     <div class="stats-card">
       <div class="stat-row"><span class="key">Total Orders</span><span class="val">${stats.totalOrders}</span></div>
       <div class="stat-row"><span class="key">Items Purchased</span><span class="val">${stats.totalItemsPurchased}</span></div>
       <div class="stat-row"><span class="key">Revenue</span><span class="val">$${stats.totalRevenue.toFixed(2)}</span></div>
       <div class="stat-row"><span class="key">Total Discounts Given</span><span class="val">$${stats.totalDiscountGiven.toFixed(2)}</span></div>
-      <div class="stat-row"><span class="key">Codes (Total / Used / Unused)</span><span class="val">${codes.total} / ${codes.used} / ${codes.unused}</span></div>
+      <div class="stat-row"><span class="key">Codes — Total / Used / Unused</span><span class="val">${codes.total} / ${codes.used} / ${codes.unused}</span></div>
+    </div>
+    <div class="codes-list">
+      <p class="codes-list-title">Discount Codes</p>
+      ${codeRows}
     </div>
   `;
 }

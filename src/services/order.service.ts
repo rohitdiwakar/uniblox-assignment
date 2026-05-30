@@ -25,6 +25,7 @@ export interface StoreStats {
     total: number;
     used: number;
     unused: number;
+    list: Array<{ code: string; percentage: number; isUsed: boolean; createdAt: Date; usedAt?: Date }>;
   };
 }
 
@@ -102,6 +103,13 @@ export function getStats(): StoreStats {
       total: codes.length,
       used: codes.filter((c) => c.isUsed).length,
       unused: codes.filter((c) => !c.isUsed).length,
+      list: codes.map(({ code, percentage, isUsed, createdAt, usedAt }) => ({
+        code,
+        percentage,
+        isUsed,
+        createdAt,
+        usedAt,
+      })),
     },
   };
 }
