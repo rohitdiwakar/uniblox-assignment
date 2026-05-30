@@ -198,31 +198,6 @@ section h2 {
 .badge-unused { background: #dcfce7; color: #15803d; }
 .muted { color: #aaa; font-size: 0.85rem; }
 
-/* ── Admin actions ── */
-.admin-actions {
-  margin-top: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.admin-hint { font-size: 0.78rem; color: #aaa; line-height: 1.4; }
-.gen-code-success {
-  padding: 12px 14px;
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  border-radius: 8px;
-  font-size: 0.88rem;
-  color: #15803d;
-}
-.gen-code-error {
-  padding: 12px 14px;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 8px;
-  font-size: 0.88rem;
-  color: #b91c1c;
-}
-
 /* ── Buttons ── */
 .btn-primary {
   flex: 1;
