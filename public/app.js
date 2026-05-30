@@ -17,6 +17,7 @@ function bindButtons() {
   document.getElementById('back-btn').addEventListener('click', showProducts);
   document.getElementById('checkout-btn').addEventListener('click', handleCheckout);
   document.getElementById('new-order-btn').addEventListener('click', resetToProducts);
+  document.getElementById('gen-code-btn').addEventListener('click', handleGenerateCode);
 }
 
 // ── Section visibility ─────────────────────────────────────────────────────
@@ -184,6 +185,26 @@ function renderStats(stats, container) {
       <div class="stat-row"><span class="key">Codes (Total / Used / Unused)</span><span class="val">${codes.total} / ${codes.used} / ${codes.unused}</span></div>
     </div>
   `;
+}
+
+// ── Admin: Generate Discount Code ─────────────────────────────────────────
+async function handleGenerateCode() {
+  const resultEl = document.getElementById('gen-code-result');
+  try {
+    const res = await fetch(`${API}/admin/discount`, { method: 'POST' });
+    const data = await res.json();
+    if (!res.ok) {
+      resultEl.className = 'gen-code-error';
+      resultEl.textContent = data.error;
+    } else {
+      resultEl.className = 'gen-code-success';
+      resultEl.innerHTML = `Code generated: <strong>${data.discountCode.code}</strong> (${data.discountCode.percentage}% off)`;
+      loadStats();
+    }
+  } catch {
+    resultEl.className = 'gen-code-error';
+    resultEl.textContent = 'Request failed';
+  }
 }
 
 // ── Reset ──────────────────────────────────────────────────────────────────

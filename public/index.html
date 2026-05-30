@@ -53,10 +53,15 @@
       </div>
     </section>
 
-    <!-- Admin Stats -->
+    <!-- Admin Panel -->
     <section id="stats-section">
-      <h2>Admin Stats</h2>
+      <h2>Admin Panel</h2>
       <div id="stats-content"><p class="muted">Loading...</p></div>
+      <div class="admin-actions">
+        <button id="gen-code-btn" class="btn-primary">Generate Discount Code</button>
+        <p class="muted admin-hint">Only works when total orders is a multiple of the configured Nth order (default: every 5th).</p>
+        <div id="gen-code-result" class="hidden"></div>
+      </div>
     </section>
 
   </main>
