@@ -17,7 +17,6 @@ function bindButtons() {
   document.getElementById('back-btn').addEventListener('click', showProducts);
   document.getElementById('checkout-btn').addEventListener('click', handleCheckout);
   document.getElementById('new-order-btn').addEventListener('click', resetToProducts);
-  document.getElementById('refresh-stats-btn').addEventListener('click', loadStats);
 }
 
 // ── Section visibility ─────────────────────────────────────────────────────
