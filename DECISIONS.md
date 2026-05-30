@@ -56,7 +56,7 @@
 
 **Choice:** Option A — auto-generate at checkout, admin API as a manual fallback.
 
-**Why:** "Every nth order *gets* a coupon code" implies the customer receives the code as part of their checkout experience, not after waiting for an admin to log in and press a button. Returning the earned code directly in the checkout response gives the user immediate feedback. The admin API is retained as a manual trigger for cases where the admin wants to generate a code outside the normal flow (e.g., customer service). The two share a `generateDiscountCodeInternal()` helper to avoid duplicated logic.
+**Why:** "Every nth order *gets* a coupon code" implies the customer receives the code as part of their checkout experience, not after waiting for an admin to log in and press a button. Returning the earned code directly in the checkout response gives the user immediate feedback. The admin API is retained as a manual trigger for cases where the admin wants to generate a code outside the normal flow (e.g., customer service). Both paths share a private `buildCode()` helper — the admin path enforces the condition guard before calling it, while `issueRewardCode()` is called by OrderService which already verified the threshold.
 
 ---
 

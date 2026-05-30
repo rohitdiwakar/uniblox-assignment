@@ -76,7 +76,7 @@ NTH_ORDER=3 DISCOUNT_PERCENTAGE=15 npm run dev
 npm test
 ```
 
-42 unit tests covering all core business logic across CartService, DiscountService, and OrderService.
+43 unit tests covering all core business logic across CartService, DiscountService, and OrderService.
 
 ---
 
@@ -197,7 +197,11 @@ Returns aggregate store statistics.
     "discountCodes": {
       "total": 2,
       "used": 1,
-      "unused": 1
+      "unused": 1,
+      "list": [
+        { "code": "SAVE10-ABCD1234", "percentage": 10, "isUsed": true },
+        { "code": "SAVE10-XYZ98765", "percentage": 10, "isUsed": false }
+      ]
     }
   }
 }
@@ -232,7 +236,7 @@ public/
   index.html          # Frontend
   style.css
   app.js
-DECISIONS.md          # 7 documented design decisions
+DECISIONS.md          # 9 documented design decisions
 ```
 
 ---
