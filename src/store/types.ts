@@ -37,8 +37,9 @@ export interface DiscountCode {
 }
 
 export interface StoreConfig {
-  nthOrder: number;          // generate a discount code every N orders
-  discountPercentage: number; // the discount amount (e.g. 10 = 10%)
+  nthOrder: number;               // generate a discount code every N orders
+  discountPercentage: number;     // the discount amount (e.g. 10 = 10%)
+  lastCodeGeneratedAtOrder: number; // tracks the milestone at which the last code was issued
 }
 
 export interface AppStore {

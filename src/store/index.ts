@@ -15,6 +15,7 @@ const store: AppStore = {
   config: {
     nthOrder: parseInt(process.env.NTH_ORDER ?? '5', 10),
     discountPercentage: parseInt(process.env.DISCOUNT_PERCENTAGE ?? '10', 10),
+    lastCodeGeneratedAtOrder: 0,
   },
 };
 
@@ -25,4 +26,5 @@ export function resetStore(): void {
   store.carts.clear();
   store.orders.length = 0;
   store.discountCodes.clear();
+  store.config.lastCodeGeneratedAtOrder = 0;
 }

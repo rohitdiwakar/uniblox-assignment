@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { CartNotFoundError, ProductNotFoundError, InvalidQuantityError } from '../services/cart.service';
-import { DiscountConditionNotMetError, InvalidDiscountCodeError, DiscountCodeAlreadyUsedError } from '../services/discount.service';
+import { DiscountConditionNotMetError, InvalidDiscountCodeError, DiscountCodeAlreadyUsedError, DiscountAlreadyGeneratedError } from '../services/discount.service';
 import { EmptyCartError } from '../services/order.service';
 
 // Maps known domain errors to appropriate HTTP status codes.
@@ -19,7 +19,8 @@ export function errorMiddleware(err: Error, _req: Request, res: Response, _next:
     err instanceof InvalidQuantityError ||
     err instanceof EmptyCartError ||
     err instanceof DiscountCodeAlreadyUsedError ||
-    err instanceof DiscountConditionNotMetError
+    err instanceof DiscountConditionNotMetError ||
+    err instanceof DiscountAlreadyGeneratedError
   ) {
     res.status(400).json({ error: err.message });
     return;

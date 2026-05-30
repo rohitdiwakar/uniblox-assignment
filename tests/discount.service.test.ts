@@ -4,6 +4,7 @@ import {
   markDiscountCodeUsed,
   getAllDiscountCodes,
   DiscountConditionNotMetError,
+  DiscountAlreadyGeneratedError,
   InvalidDiscountCodeError,
   DiscountCodeAlreadyUsedError,
 } from '../src/services/discount.service';
@@ -61,11 +62,17 @@ describe('generateDiscountCode', () => {
     expect(store.discountCodes.has(code.code)).toBe(true);
   });
 
-  it('generates unique codes on successive calls', () => {
+  it('throws DiscountAlreadyGeneratedError when called twice for the same milestone', () => {
     seedOrders(5);
-    const code1 = generateDiscountCode();
-    const code2 = generateDiscountCode();
-    expect(code1.code).not.toBe(code2.code);
+    generateDiscountCode(); // first call succeeds
+    expect(() => generateDiscountCode()).toThrow(DiscountAlreadyGeneratedError);
+  });
+
+  it('allows generating again once the next milestone is reached', () => {
+    seedOrders(5);
+    generateDiscountCode();  // milestone 5 — ok
+    seedOrders(5);           // now at 10
+    expect(() => generateDiscountCode()).not.toThrow(); // milestone 10 — ok
   });
 });
 
@@ -112,8 +119,9 @@ describe('getAllDiscountCodes', () => {
 
   it('returns all codes including used and unused', () => {
     seedOrders(5);
-    generateDiscountCode();
-    generateDiscountCode();
+    generateDiscountCode();  // milestone 5
+    seedOrders(5);           // now at 10
+    generateDiscountCode();  // milestone 10
     expect(getAllDiscountCodes()).toHaveLength(2);
   });
 });

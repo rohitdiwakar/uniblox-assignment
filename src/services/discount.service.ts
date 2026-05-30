@@ -12,6 +12,13 @@ export class DiscountConditionNotMetError extends Error {
   }
 }
 
+export class DiscountAlreadyGeneratedError extends Error {
+  constructor() {
+    super('A discount code has already been generated for this order milestone.');
+    this.name = 'DiscountAlreadyGeneratedError';
+  }
+}
+
 export class InvalidDiscountCodeError extends Error {
   constructor(code: string) {
     super(`Discount code '${code}' is not valid`);
@@ -26,37 +33,7 @@ export class DiscountCodeAlreadyUsedError extends Error {
   }
 }
 
-/**
- * Generates a human-readable discount code tied to the current config percentage.
- * Only succeeds if total orders placed is a non-zero multiple of nthOrder,
- * ensuring the condition "every nth order earns a code" is enforced.
- */
-export function generateDiscountCode(): DiscountCode {
-  const { nthOrder, discountPercentage } = store.config;
-  const orderCount = store.orders.length;
-
-  if (orderCount === 0 || orderCount % nthOrder !== 0) {
-    throw new DiscountConditionNotMetError(nthOrder);
-  }
-
-  const code = `SAVE${discountPercentage}-${uuidv4().slice(0, 8).toUpperCase()}`;
-  const discountCode: DiscountCode = {
-    code,
-    percentage: discountPercentage,
-    isUsed: false,
-    createdAt: new Date(),
-  };
-
-  store.discountCodes.set(code, discountCode);
-  return discountCode;
-}
-
-/**
- * Internal helper called at checkout to auto-generate a code when the nth order threshold is hit.
- * Unlike generateDiscountCode(), this does not enforce the condition check — the caller
- * (OrderService) is responsible for checking the threshold before calling this.
- */
-export function generateDiscountCodeInternal(): DiscountCode {
+function buildCode(): DiscountCode {
   const { discountPercentage } = store.config;
   const code = `SAVE${discountPercentage}-${uuidv4().slice(0, 8).toUpperCase()}`;
   const discountCode: DiscountCode = {
@@ -66,7 +43,36 @@ export function generateDiscountCodeInternal(): DiscountCode {
     createdAt: new Date(),
   };
   store.discountCodes.set(code, discountCode);
+  store.config.lastCodeGeneratedAtOrder = store.orders.length;
   return discountCode;
+}
+
+/**
+ * Admin-triggered code generation.
+ * Requires: order count is a non-zero multiple of nthOrder AND no code has been
+ * issued for this milestone yet.
+ */
+export function generateDiscountCode(): DiscountCode {
+  const { nthOrder, lastCodeGeneratedAtOrder } = store.config;
+  const orderCount = store.orders.length;
+
+  if (orderCount === 0 || orderCount % nthOrder !== 0) {
+    throw new DiscountConditionNotMetError(nthOrder);
+  }
+
+  if (lastCodeGeneratedAtOrder === orderCount) {
+    throw new DiscountAlreadyGeneratedError();
+  }
+
+  return buildCode();
+}
+
+/**
+ * Auto-triggered at checkout when the nth order threshold is hit.
+ * Caller (OrderService) already verified the threshold; this just builds and persists.
+ */
+export function generateDiscountCodeInternal(): DiscountCode {
+  return buildCode();
 }
 
 export function validateDiscountCode(code: string): DiscountCode {
