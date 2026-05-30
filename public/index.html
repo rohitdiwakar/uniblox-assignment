@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UniBlox Store</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <h1>UniBlox Store</h1>
+      <button id="cart-toggle-btn" class="cart-btn">
+        Cart (<span id="cart-count">0</span>)
+      </button>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- Products -->
+    <section id="products-section">
+      <h2>Products</h2>
+      <div id="products-grid"></div>
+    </section>
+
+    <!-- Cart -->
+    <section id="cart-section" class="hidden">
+      <h2>Your Cart</h2>
+      <div id="cart-items"></div>
+      <div id="cart-footer">
+        <div class="subtotal-row">
+          Subtotal: <strong id="cart-subtotal">$0.00</strong>
+        </div>
+        <div class="discount-row">
+          <input type="text" id="discount-input" placeholder="Discount code (optional)" />
+        </div>
+        <div class="cart-actions">
+          <button id="back-btn" class="btn-secondary">Back to Products</button>
+          <button id="checkout-btn" class="btn-primary">Place Order</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Order Confirmation -->
+    <section id="confirmation-section" class="hidden">
+      <div class="confirmation-card">
+        <div class="check-icon">&#10003;</div>
+        <h2>Order Confirmed!</h2>
+        <div id="order-summary"></div>
+        <button id="new-order-btn" class="btn-primary">Continue Shopping</button>
+      </div>
+    </section>
+
+    <!-- Admin Stats -->
+    <section id="stats-section">
+      <div class="stats-header">
+        <h2>Admin Stats</h2>
+        <button id="refresh-stats-btn" class="btn-secondary">Refresh</button>
+      </div>
+      <div id="stats-content"><p class="muted">Loading...</p></div>
+    </section>
+
+  </main>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
