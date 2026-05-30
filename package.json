@@ -1,0 +1,29 @@
+{
+  "name": "ecommerce-api",
+  "version": "1.0.0",
+  "description": "E-commerce API with cart, checkout, and discount system",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "ts-node src/server.ts",
+    "test": "jest --runInBand --forceExit",
+    "test:watch": "jest --watch --runInBand"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.11.5",
+    "@types/supertest": "^6.0.2",
+    "@types/uuid": "^9.0.7",
+    "jest": "^29.7.0",
+    "supertest": "^6.3.4",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}
