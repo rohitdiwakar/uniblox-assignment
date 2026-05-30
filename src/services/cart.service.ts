@@ -65,6 +65,8 @@ export function clearCart(cartId: string): void {
   store.carts.delete(cartId);
 }
 
-export function createCartId(): string {
-  return uuidv4();
+export function createCart(): Cart {
+  const cart: Cart = { id: uuidv4(), items: [], createdAt: new Date() };
+  store.carts.set(cart.id, cart);
+  return cart;
 }

@@ -68,10 +68,10 @@ export function generateDiscountCode(): DiscountCode {
 }
 
 /**
- * Auto-triggered at checkout when the nth order threshold is hit.
- * Caller (OrderService) already verified the threshold; this just builds and persists.
+ * Issues a reward discount code automatically when the nth order threshold is hit.
+ * Called by OrderService after checkout — the threshold check happens there.
  */
-export function generateDiscountCodeInternal(): DiscountCode {
+export function issueRewardCode(): DiscountCode {
   return buildCode();
 }
 

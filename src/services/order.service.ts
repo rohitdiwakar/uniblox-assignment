@@ -2,7 +2,9 @@ import { v4 as uuidv4 } from 'uuid';
 import store from '../store';
 import { Order } from '../store/types';
 import { clearCart, CartNotFoundError } from './cart.service';
-import { validateDiscountCode, markDiscountCodeUsed, generateDiscountCodeInternal } from './discount.service';
+import { validateDiscountCode, markDiscountCodeUsed, issueRewardCode } from './discount.service';
+
+const round2 = (n: number): number => parseFloat(n.toFixed(2));
 
 export class EmptyCartError extends Error {
   constructor(cartId: string) {
@@ -49,14 +51,14 @@ export function checkout(cartId: string, discountCode?: string): CheckoutResult 
   const validCode = discountCode ? validateDiscountCode(discountCode) : undefined;
 
   const subtotal = cart.items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
-  const discountAmount = validCode ? parseFloat(((subtotal * validCode.percentage) / 100).toFixed(2)) : 0;
-  const total = parseFloat((subtotal - discountAmount).toFixed(2));
+  const discountAmount = validCode ? round2((subtotal * validCode.percentage) / 100) : 0;
+  const total = round2(subtotal - discountAmount);
 
   const order: Order = {
     id: uuidv4(),
     cartId,
     items: [...cart.items],
-    subtotal: parseFloat(subtotal.toFixed(2)),
+    subtotal: round2(subtotal),
     discountCode: validCode?.code,
     discountAmount,
     total,
@@ -71,7 +73,7 @@ export function checkout(cartId: string, discountCode?: string): CheckoutResult 
 
   // Check if this completed order hits the nth-order threshold
   const isNthOrder = store.orders.length % store.config.nthOrder === 0;
-  const earnedDiscountCode = isNthOrder ? generateDiscountCodeInternal() : undefined;
+  const earnedDiscountCode = isNthOrder ? issueRewardCode() : undefined;
 
   clearCart(cartId);
 
@@ -86,13 +88,8 @@ export function getStats(): StoreStats {
     0
   );
 
-  const totalRevenue = parseFloat(
-    store.orders.reduce((sum, order) => sum + order.total, 0).toFixed(2)
-  );
-
-  const totalDiscountGiven = parseFloat(
-    store.orders.reduce((sum, order) => sum + order.discountAmount, 0).toFixed(2)
-  );
+  const totalRevenue = round2(store.orders.reduce((sum, order) => sum + order.total, 0));
+  const totalDiscountGiven = round2(store.orders.reduce((sum, order) => sum + order.discountAmount, 0));
 
   return {
     totalOrders: store.orders.length,

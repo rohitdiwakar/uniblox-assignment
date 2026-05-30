@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { addItemToCart, getCart, createCartId } from '../services/cart.service';
-import store from '../store';
+import { addItemToCart, getCart, createCart } from '../services/cart.service';
+import store from '../store'; // read-only: used only for listing products
 
 const router = Router();
 
@@ -12,10 +12,8 @@ router.get('/products', (_req: Request, res: Response) => {
 
 // POST /cart — create a new cart and return its id
 router.post('/cart', (_req: Request, res: Response) => {
-  const cartId = createCartId();
-  const cart = { id: cartId, items: [], createdAt: new Date() };
-  store.carts.set(cartId, cart);
-  res.status(201).json({ cartId });
+  const cart = createCart();
+  res.status(201).json({ cartId: cart.id });
 });
 
 // POST /cart/:cartId/items — add a product to a cart

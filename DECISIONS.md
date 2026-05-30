@@ -99,3 +99,32 @@
 **Choice:** Option B — environment variables with defaults.
 
 **Why:** Environment variables allow different values in different environments (development, testing, production) without code changes. Tests can verify behavior at any threshold by manipulating `store.config` directly rather than changing source code. The defaults (`N=5`, `X=10`) are sensible out-of-the-box values so the app works with zero configuration. Hardcoding would make testing different N values awkward and would require a code deploy to change business parameters.
+
+---
+
+## Decision 8: One Discount Code Per Order Milestone (Deduplication via `lastCodeGeneratedAtOrder`)
+
+**Context:** The checkout flow auto-generates a discount code on every Nth order. The admin API can also trigger generation manually when the condition is met. Without a guard, both paths could fire for the same milestone, producing multiple codes for a single reward event — which is unintended abuse.
+
+**Options Considered:**
+- Option A: Allow multiple codes per milestone — simple, no tracking needed
+- Option B: Track the order count at which the last code was issued; block generation if the current count matches
+
+**Choice:** Option B — track `lastCodeGeneratedAtOrder` in store config.
+
+**Why:** One milestone should produce exactly one reward code. Allowing duplicates lets a customer (or admin) generate unlimited codes at the same threshold, defeating the purpose of the reward system. The fix is lightweight: a single integer field on the config, set whenever a code is issued. Both the admin path and the auto-checkout path share the same `buildCode()` helper which stamps this field, so the guard is impossible to bypass regardless of which path triggered the generation. `resetStore()` resets this field to ensure test isolation.
+
+---
+
+## Decision 9: Admin Endpoints Have No Authentication
+
+**Context:** The two admin endpoints (`POST /admin/discount`, `GET /admin/stats`) expose privileged operations — generating discount codes and viewing revenue data. Should they require authentication?
+
+**Options Considered:**
+- Option A: No auth — document the gap, note the production approach
+- Option B: Hardcoded API key checked via a request header
+- Option C: JWT middleware with a separate login flow
+
+**Choice:** Option A — no auth, explicitly documented.
+
+**Why:** The assignment scope is the discount and cart system, not an auth system. Adding JWT requires a user store, token signing, and a login endpoint — all outside the problem statement. A hardcoded API key would give false confidence without real security. The correct production approach is an auth middleware layer (JWT or API key from a secrets manager) applied to an `adminRouter` — the route structure already supports this cleanly since admin routes are registered separately. Leaving it undone and documenting it is more honest than adding security theatre.
